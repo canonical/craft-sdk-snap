@@ -30,114 +30,13 @@ parts:
     prime:
       - -*
 
-  annotated-types-wheel:
-    plugin: nil
-    source: .
-    build-packages:
-      - python3-pip
-      - python3-venv
-    override-build: |
-      set -eux
-
-      mkdir -p "$CRAFT_PART_INSTALL/wheels"
-
-      # Build annotated-types wheel from source distribution.
-      python3 -m venv "$CRAFT_PART_BUILD/.venv"
-      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
-      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
-
-      "$VENV_PIP" install --upgrade pip setuptools wheel
-      "$VENV_PY" -m pip wheel --no-binary=:all: annotated-types==0.7.0 -w "$CRAFT_PART_INSTALL/wheels/"
-    stage:
-      - wheels/**
-    prime:
-      - wheels/**
-
-  typing-extensions-wheel:
-    plugin: nil
-    source: .
-    build-packages:
-      - python3-pip
-      - python3-venv
-    override-build: |
-      set -eux
-
-      mkdir -p "$CRAFT_PART_INSTALL/wheels"
-
-      # Build typing-extensions wheel from source distribution.
-      python3 -m venv "$CRAFT_PART_BUILD/.venv"
-      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
-      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
-
-      "$VENV_PIP" install --upgrade pip setuptools wheel
-      "$VENV_PY" -m pip wheel --no-binary=:all: typing-extensions==4.15.0 -w "$CRAFT_PART_INSTALL/wheels/"
-    stage:
-      - wheels/**
-    prime:
-      - wheels/**
-
-  typing-inspection-wheel:
-    plugin: nil
-    source: .
-    build-packages:
-      - python3-pip
-      - python3-venv
-    override-build: |
-      set -eux
-
-      mkdir -p "$CRAFT_PART_INSTALL/wheels"
-
-      # Build typing-inspection wheel from source distribution.
-      python3 -m venv "$CRAFT_PART_BUILD/.venv"
-      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
-      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
-
-      "$VENV_PIP" install --upgrade pip setuptools wheel
-      "$VENV_PY" -m pip wheel --no-binary=:all: typing-inspection==0.4.2 -w "$CRAFT_PART_INSTALL/wheels/"
-    stage:
-      - wheels/**
-    prime:
-      - wheels/**
-
-  pydantic-core-wheel:
-    plugin: nil
-    source: https://github.com/pydantic/pydantic
-    source-type: git
-    source-tag: v2.13.4
-    after:
-      - rust-deps
-    build-packages:
-      - python3-pip
-      - python3-venv
-      - git
-    override-build: |
-      set -eux
-
-      mkdir -p "$CRAFT_PART_INSTALL/wheels"
-
-      # Build pydantic-core wheel from source using an isolated venv.
-      python3 -m venv "$CRAFT_PART_BUILD/.venv"
-      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
-      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
-      CORE_SRC="$CRAFT_PART_SRC/pydantic-core"
-
-      "$VENV_PIP" install --upgrade pip setuptools wheel build
-      "$VENV_PY" -m build --wheel --outdir "$CRAFT_PART_INSTALL/wheels/" "$CORE_SRC"
-    stage:
-      - wheels/**
-    prime:
-      - wheels/**
-
   pydantic-wheel:
     plugin: nil
     source: https://github.com/pydantic/pydantic
     source-type: git
-    source-tag: v2.13.4
+    source-tag: v2.8.2
     after:
-      - annotated-types-wheel
-      - typing-extensions-wheel
-      - typing-inspection-wheel
-      - pydantic-core-wheel
+      - rust-deps
     build-packages:
       - python3-pip
       - python3-venv
@@ -152,9 +51,7 @@ parts:
       VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
       VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
 
-      "$VENV_PIP" install --upgrade pip setuptools wheel build
-      "$VENV_PIP" install --no-deps --no-index --find-links="$CRAFT_STAGE/wheels" pydantic-core
-      "$VENV_PY" -m build --wheel --outdir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
+      "$VENV_PY" -m pip wheel --no-binary ":all:" --wheel-dir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
     stage:
       - wheels/**
     prime:
