@@ -81,14 +81,14 @@ parts:
 
   pydantic-core-wheel:
     plugin: nil
-    source: https://github.com/pydantic/pydantic-core
+    source: https://github.com/pydantic/pydantic
     source-type: git
-    source-tag: v2.33.2
+    source-tag: v2.13.4
+    build-snaps:
+      - rustup
     build-packages:
       - python3-pip
       - python3-venv
-      - rustc
-      - cargo
       - git
     override-build: |
       set -eux
@@ -99,9 +99,27 @@ parts:
       python3 -m venv "$CRAFT_PART_BUILD/.venv"
       VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
       VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
+      CORE_SRC="$CRAFT_PART_SRC/pydantic-core"
+
+      # Use rustup from the build-snap for a modern cargo toolchain.
+      export PATH="/snap/rustup/current/bin:$PATH"
+      rustup toolchain install stable --profile minimal
+      rustup default stable
+      cargo --version
+
+      if [ ! -d "$CORE_SRC" ]; then
+        echo "pydantic-core source directory not found: $CORE_SRC"
+        exit 1
+      fi
 
       "$VENV_PIP" install --upgrade pip setuptools wheel build
-      "$VENV_PY" -m build --wheel --outdir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
+      "$VENV_PY" -m build --wheel --outdir "$CRAFT_PART_INSTALL/wheels/" "$CORE_SRC"
+
+      if ! ls "$CRAFT_PART_INSTALL/wheels"/pydantic_core-*.whl >/dev/null 2>&1; then
+        echo "Expected pydantic_core wheel was not produced"
+        ls -la "$CRAFT_PART_INSTALL/wheels/"
+        exit 1
+      fi
     stage:
       - wheels/**
     prime:
