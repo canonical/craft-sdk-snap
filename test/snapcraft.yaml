@@ -1,0 +1,36 @@
+name: test-python-app
+version: '0.1'
+summary: Test consumer for craft-sdk build-snap
+description: |
+  Demonstrates consuming the craft-sdk build-snap to satisfy a Python
+  project dependency on pydantic during snap build.
+
+base: core24
+confinement: strict
+
+title: test-python-app
+
+build-snaps:
+  - craft-sdk/latest/edge
+
+parts:
+  app:
+    plugin: nil
+    source: .
+    build-packages:
+      - python3-venv
+      - python3-pip
+    override-build: |
+      set -eux
+
+      python3 -m venv "$CRAFT_PART_INSTALL/venv"
+      VENV_PIP="$CRAFT_PART_INSTALL/venv/bin/pip"
+
+      "$VENV_PIP" install --upgrade pip setuptools wheel
+
+      # Install project deps from the provider build-snap wheels only.
+      "$VENV_PIP" install --no-build-isolation --no-index --find-links="/snap/craft-sdk/current/wheels" "$CRAFT_PART_SRC"
+
+apps:
+  my-app:
+    command: venv/bin/python -m my_app
