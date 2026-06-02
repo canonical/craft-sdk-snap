@@ -34,7 +34,7 @@ parts:
     plugin: nil
     source: https://github.com/pydantic/pydantic
     source-type: git
-    source-tag: v2.8.2
+    source-tag: v2.13.3
     after:
       - rust-deps
     build-packages:

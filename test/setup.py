@@ -7,7 +7,7 @@ setup(
     description='Sample Python app depending on pydantic',
     py_modules=['my_app'],
     install_requires=[
-        'pydantic~=2.8',
+        'pydantic>=2.8',
     ],
     entry_points={
         'console_scripts': [
