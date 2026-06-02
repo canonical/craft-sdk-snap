@@ -37,3 +37,32 @@ parts:
       - wheels/**
     prime:
       - wheels/**
+
+  pydantic-wheel:
+    plugin: nil
+    source: https://github.com/pydantic/pydantic
+    source-type: git
+    source-tag: v2.13.4
+    after:
+      - pydantic-core-wheel
+    build-packages:
+      - python3-pip
+      - python3-venv
+      - git
+    override-build: |
+      set -eux
+
+      mkdir -p "$CRAFT_PART_INSTALL/wheels"
+
+      # Build pydantic wheel from source using an isolated venv.
+      python3 -m venv "$CRAFT_PART_BUILD/.venv"
+      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
+      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
+
+      "$VENV_PIP" install --upgrade pip setuptools wheel build
+      "$VENV_PIP" install --no-deps --no-index --find-links="$CRAFT_STAGE/wheels" pydantic-core
+      "$VENV_PY" -m build --wheel --outdir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
+    stage:
+      - wheels/**
+    prime:
+      - wheels/**
