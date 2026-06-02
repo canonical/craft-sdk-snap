@@ -39,19 +39,8 @@ parts:
       - rust-deps
     build-packages:
       - python3-pip
-      - python3-venv
-      - git
     override-build: |
-      set -eux
-
-      mkdir -p "$CRAFT_PART_INSTALL/wheels"
-
-      # Build pydantic wheel from source using an isolated venv.
-      python3 -m venv "$CRAFT_PART_BUILD/.venv"
-      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
-      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
-
-      "$VENV_PY" -m pip wheel --no-binary ":all:" --wheel-dir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
+      python3 -m pip wheel --no-binary ":all:" --wheel-dir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
     stage:
       - wheels/**
     prime:
