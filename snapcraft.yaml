@@ -10,6 +10,26 @@ base: core24
 confinement: strict
 
 parts:
+  rust-deps:
+    plugin: nil
+    build-packages:
+      # We suspect that rust 1.90+ new linker uses too much memory,
+      # which hangs armhf on launchpad
+      # ref: https://blog.rust-lang.org/2025/09/01/rust-lld-on-1.90.0-stable/
+      - cargo-1.89
+      - rustc-1.89
+    override-build: |
+      # We need newer versions of cargo and rustc than the default 'cargo'
+      # and 'rustc' packages provide, but they don't set the `cargo`
+      # and `rustc` commands needed by maturin.
+      # These commands specifically allow pydantic-core to build using the
+      # non-default rust.
+      mkdir -p "${CRAFT_PART_INSTALL}/bin"
+      ln -s $(which cargo-1.89) "${CRAFT_PART_INSTALL}/bin/cargo"
+      ln -s $(which rustc-1.89) "${CRAFT_PART_INSTALL}/bin/rustc"
+    prime:
+      - -*
+
   annotated-types-wheel:
     plugin: nil
     source: .
@@ -84,8 +104,8 @@ parts:
     source: https://github.com/pydantic/pydantic
     source-type: git
     source-tag: v2.13.4
-    build-snaps:
-      - rustup
+    after:
+      - rust-deps
     build-packages:
       - python3-pip
       - python3-venv
@@ -101,25 +121,8 @@ parts:
       VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
       CORE_SRC="$CRAFT_PART_SRC/pydantic-core"
 
-      # Use rustup from the build-snap for a modern cargo toolchain.
-      export PATH="/snap/rustup/current/bin:$PATH"
-      rustup toolchain install stable --profile minimal
-      rustup default stable
-      cargo --version
-
-      if [ ! -d "$CORE_SRC" ]; then
-        echo "pydantic-core source directory not found: $CORE_SRC"
-        exit 1
-      fi
-
       "$VENV_PIP" install --upgrade pip setuptools wheel build
       "$VENV_PY" -m build --wheel --outdir "$CRAFT_PART_INSTALL/wheels/" "$CORE_SRC"
-
-      if ! ls "$CRAFT_PART_INSTALL/wheels"/pydantic_core-*.whl >/dev/null 2>&1; then
-        echo "Expected pydantic_core wheel was not produced"
-        ls -la "$CRAFT_PART_INSTALL/wheels/"
-        exit 1
-      fi
     stage:
       - wheels/**
     prime:
