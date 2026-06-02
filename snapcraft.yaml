@@ -10,6 +10,75 @@ base: core24
 confinement: strict
 
 parts:
+  annotated-types-wheel:
+    plugin: nil
+    source: .
+    build-packages:
+      - python3-pip
+      - python3-venv
+    override-build: |
+      set -eux
+
+      mkdir -p "$CRAFT_PART_INSTALL/wheels"
+
+      # Build annotated-types wheel from source distribution.
+      python3 -m venv "$CRAFT_PART_BUILD/.venv"
+      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
+      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
+
+      "$VENV_PIP" install --upgrade pip setuptools wheel
+      "$VENV_PY" -m pip wheel --no-binary=:all: annotated-types==0.7.0 -w "$CRAFT_PART_INSTALL/wheels/"
+    stage:
+      - wheels/**
+    prime:
+      - wheels/**
+
+  typing-extensions-wheel:
+    plugin: nil
+    source: .
+    build-packages:
+      - python3-pip
+      - python3-venv
+    override-build: |
+      set -eux
+
+      mkdir -p "$CRAFT_PART_INSTALL/wheels"
+
+      # Build typing-extensions wheel from source distribution.
+      python3 -m venv "$CRAFT_PART_BUILD/.venv"
+      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
+      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
+
+      "$VENV_PIP" install --upgrade pip setuptools wheel
+      "$VENV_PY" -m pip wheel --no-binary=:all: typing-extensions==4.15.0 -w "$CRAFT_PART_INSTALL/wheels/"
+    stage:
+      - wheels/**
+    prime:
+      - wheels/**
+
+  typing-inspection-wheel:
+    plugin: nil
+    source: .
+    build-packages:
+      - python3-pip
+      - python3-venv
+    override-build: |
+      set -eux
+
+      mkdir -p "$CRAFT_PART_INSTALL/wheels"
+
+      # Build typing-inspection wheel from source distribution.
+      python3 -m venv "$CRAFT_PART_BUILD/.venv"
+      VENV_PY="$CRAFT_PART_BUILD/.venv/bin/python"
+      VENV_PIP="$CRAFT_PART_BUILD/.venv/bin/pip"
+
+      "$VENV_PIP" install --upgrade pip setuptools wheel
+      "$VENV_PY" -m pip wheel --no-binary=:all: typing-inspection==0.4.2 -w "$CRAFT_PART_INSTALL/wheels/"
+    stage:
+      - wheels/**
+    prime:
+      - wheels/**
+
   pydantic-core-wheel:
     plugin: nil
     source: https://github.com/pydantic/pydantic-core
@@ -44,6 +113,9 @@ parts:
     source-type: git
     source-tag: v2.13.4
     after:
+      - annotated-types-wheel
+      - typing-extensions-wheel
+      - typing-inspection-wheel
       - pydantic-core-wheel
     build-packages:
       - python3-pip
