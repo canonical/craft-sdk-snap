@@ -50,7 +50,7 @@ jobs:
           cd test
           # we do a destructive build since we can't inject snaps into a build environment
           # see https://github.com/canonical/snapcraft/issues/4706
-          snapcraft pack --destructive-mode --verbosity=trace
+          sudo snapcraft pack --destructive-mode --verbosity=trace
 
           # test that snapcraft didn't refresh channels
           snap info craft-sdk
