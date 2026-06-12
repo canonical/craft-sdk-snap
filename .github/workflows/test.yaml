@@ -27,7 +27,8 @@ jobs:
 
 
   test:
-    runs-on: ubuntu-latest
+    # matches the base of the test snap
+    runs-on: ubuntu-24.04
     needs: build
 
     steps:
@@ -40,15 +41,18 @@ jobs:
           name: craft-sdk-snap
 
       - name: Build the test snap
-        uses: canonical/craft-actions/snapcraft/pack@67304fab78ef627dc3f2e72c8a6ad51a493a6070 # main as of 2026-06-11
-        with:
-          path: test
+        run: |
+          sudo snap install craft-sdk*.snap --dangerous
+
+          # do a destructive build since we can't inject snaps into a build environment
+          # see https://github.com/canonical/snapcraft/issues/4706
+          snapcraft pack --destructive-mode --verbosity=debug
 
       - name: Test the test snap
         run: |
           sudo snap install ./test/test-python-app*.snap --dangerous
 
-          output=$(test-python-app.my-app)
+          output=$(test-python-app)
           echo "$output"
 
           if ! grep -q "Validation works:" <<< "$output"; then
