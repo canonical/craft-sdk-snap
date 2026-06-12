@@ -45,6 +45,8 @@ jobs:
 
       - name: Build the test snap
         run: |
+          sudo snap install snapcraft --classic
+
           cd test
           # we do a destructive build since we can't inject snaps into a build environment
           # see https://github.com/canonical/snapcraft/issues/4706
