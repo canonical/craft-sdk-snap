@@ -45,16 +45,15 @@ jobs:
 
       - name: Build the test snap
         run: |
+          cd test
           sudo snap install snapcraft --classic
 
-          cd test
           # we do a destructive build since we can't inject snaps into a build environment
           # see https://github.com/canonical/snapcraft/issues/4706
-          sudo snapcraft pack --destructive-mode --verbosity=trace
+          sudo snapcraft pack --destructive-mode --verbosity=debug
 
-          # test that snapcraft didn't refresh channels
-          snap info craft-sdk
-          exit 1
+          # a naive check that snapcraft didn't refresh craft-sdk to a version from the store
+          test "$(readlink -f /snap/craft-sdk/current)" = "/snap/craft-sdk/x1"
 
       - name: Test the test snap
         run: |
