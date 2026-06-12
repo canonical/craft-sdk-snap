@@ -25,7 +25,6 @@ jobs:
           name: craft-sdk-snap
           path: craft-sdk*.snap
 
-
   test:
     # matches the base of the test snap
     runs-on: ubuntu-24.04
@@ -40,13 +39,20 @@ jobs:
         with:
           name: craft-sdk-snap
 
-      - name: Build the test snap
+      - name: Install the craft-sdk snap
         run: |
           sudo snap install craft-sdk*.snap --dangerous
 
-          # do a destructive build since we can't inject snaps into a build environment
+      - name: Build the test snap
+        run: |
+          cd test
+          # we do a destructive build since we can't inject snaps into a build environment
           # see https://github.com/canonical/snapcraft/issues/4706
-          snapcraft pack --destructive-mode --verbosity=debug
+          snapcraft pack --destructive-mode --verbosity=trace
+
+          # test that snapcraft didn't refresh channels
+          snap info craft-sdk
+          exit 1
 
       - name: Test the test snap
         run: |

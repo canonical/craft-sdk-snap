@@ -9,8 +9,12 @@ description: |
 base: core24
 confinement: strict
 
+lint:
+  ignore:
+    - metadata
+
 build-snaps:
-  - craft-sdk/latest/edge
+  - craft-sdk
 
 apps:
   test-python-app:

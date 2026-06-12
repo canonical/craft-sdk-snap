@@ -1,29 +1,45 @@
-# craft-sdk pydantic wheel build-snap demo
+# craft-sdk snap
 
-This repository contains:
+The craft-sdk snap contains pre-built wheels needed by Craft apps, such as Snapcraft
+and Rockcraft.
 
-- a provider snap (`craft-sdk`) that publishes wheels (including pydantic and pydantic-core)
-- a consumer snap in `test/` that uses `craft-sdk/latest/edge` as a `build-snap`
+## Background
 
-## Prerequisites
+The Craft apps build Python dependencies from source instead of relying on
+pre-built wheels from an external source such as PyPI. Building from source
+is resource-intensive and requires additional tooling for certain libraries.
+For example, [cryptography](https://github.com/pyca/cryptography) and
+[pydantic](https://github.com/pydantic/pydantic) require compatible versions of Cargo
+to build.
+
+This snap provides pre-built wheels for these libraries, allowing Craft apps to avoid
+rebuilding them independently.
+
+For an example, see the snap in the `test/` directory, which consumes craft-sdk as
+a build-snap.
+
+## Testing
+
+### Prerequisites
 
 - Snapcraft installed
-- Access to `craft-sdk/latest/edge` on the Snap Store
+- Access to [`craft-sd`](https://snapcraft.io/craft-sdk) on the Snap Store
 
-## Build the consumer snap
+### Build the consumer snap
 
 ```bash
 cd test
 snapcraft pack
 ```
 
-## Install and run the consumer snap
+### Install and run the consumer snap
 
 ```bash
 sudo snap install ./test-python-app_0.1_amd64.snap --dangerous
-snap run test-python-app.my-app
+test-python-app
 ```
 
-## Expected behavior
+### Expected behavior
 
-The app should run pydantic validation successfully, confirming that pydantic is resolved from wheels provided by `craft-sdk` during build.
+The app should run pydantic validation successfully, confirming that pydantic is
+resolved from wheels provided by `craft-sdk` during build.
