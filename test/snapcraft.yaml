@@ -13,9 +13,6 @@ lint:
   ignore:
     - metadata
 
-build-snaps:
-  - craft-sdk
-
 apps:
   test-python-app:
     command: venv/bin/python -m my_app
