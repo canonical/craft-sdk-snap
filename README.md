@@ -25,6 +25,14 @@ a build-snap.
 - Snapcraft installed
 - Access to [`craft-sd`](https://snapcraft.io/craft-sdk) on the Snap Store
 
+### Build the craft-sdk snap
+
+```bash
+snapcraft pack
+# The test will install a local copy of the snap from its directory.
+cp craft-sdk*.snap test/craft-sdk-snap
+```
+
 ### Build the consumer snap
 
 ```bash

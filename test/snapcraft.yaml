@@ -21,9 +21,23 @@ apps:
     command: venv/bin/python -m my_app
 
 parts:
+  # This part can be replaced with a `build-snaps` entry once
+  # https://github.com/canonical/snapcraft/issues/4706 is complete.
+  craft-sdk:
+    plugin: nil
+    source: .
+    override-pull: |
+      craftctl default
+
+      # Assumes a copy of the craft-sdk snap has been placed in this test directory and
+      # named 'craft-sdk-snap'. We omit the '.snap' suffix because snapcraft excludes
+      # snap files from local sources.
+      snap install $CRAFT_PART_SRC/craft-sdk-snap --dangerous
+
   app:
     plugin: nil
     source: .
+    after: [craft-sdk]
     build-packages:
       - python3-venv
       - python3-pip
