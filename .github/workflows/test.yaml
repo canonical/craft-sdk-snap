@@ -43,15 +43,10 @@ jobs:
         run: |
           mv test/*.snap test/craft-sdk-snap
 
-      - name: Install snapcraft
-        run: |
-          sudo snap install snapcraft --classic
-
-      - name: Build the test snap
-        run: |
-          cd test
-
-          sudo snapcraft pack --verbosity=debug
+      - name: Build craft-sdk snap
+        uses: canonical/craft-actions/snapcraft/pack@67304fab78ef627dc3f2e72c8a6ad51a493a6070 # main as of 2026-06-11
+        with:
+          path: test
 
       - name: Test the test snap
         run: |
