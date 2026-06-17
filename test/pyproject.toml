@@ -1,0 +1,13 @@
+[project]
+name = "my-app"
+version = "0.1.0"
+description = "Sample Python app depending on pydantic"
+requires-python = ">=3.10"
+dependencies = ["pydantic>=2.8"]
+
+[project.scripts]
+my-app = "my_app:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
