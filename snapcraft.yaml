@@ -2,8 +2,9 @@ name: craft-sdk
 version: '0.1'
 summary: Prebuilt craft dependencies for use as a build-snap
 description: |
-  This snap contains prebuilt wheels for the pydantic Python library.
-  It can be used as a build-snap to provide pydantic to other snaps
+  This snap contains prebuilt wheels for Python libraries including
+  pydantic, lxml, and cryptography.
+  It can be used as a build-snap to provide these dependencies to other snaps
   at build time.
 
 base: core24
@@ -39,6 +40,46 @@ parts:
       - rust-deps
     build-packages:
       - python3-pip
+    override-build: |
+      python3 -m pip wheel --no-binary ":all:" --wheel-dir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
+    stage:
+      - wheels/**
+    prime:
+      - wheels/**
+
+  lxml-wheel:
+    plugin: nil
+    source: https://github.com/lxml/lxml
+    source-type: git
+    source-tag: lxml-6.1.0
+    build-packages:
+      - python3-pip
+      - python3-dev
+      - build-essential
+      - libxml2-dev
+      - libxslt1-dev
+      - zlib1g-dev
+    override-build: |
+      python3 -m pip wheel --no-binary ":all:" --wheel-dir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
+    stage:
+      - wheels/**
+    prime:
+      - wheels/**
+
+  cryptography-wheel:
+    plugin: nil
+    source: https://github.com/pyca/cryptography
+    source-type: git
+    source-tag: 47.0.0
+    after:
+      - rust-deps
+    build-packages:
+      - python3-pip
+      - python3-dev
+      - build-essential
+      - libssl-dev
+      - libffi-dev
+      - pkg-config
     override-build: |
       python3 -m pip wheel --no-binary ":all:" --wheel-dir "$CRAFT_PART_INSTALL/wheels/" "$CRAFT_PART_SRC"
     stage:
