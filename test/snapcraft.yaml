@@ -4,7 +4,7 @@ version: "0.1"
 summary: Test consumer for craft-sdk build-snap
 description: |
   Demonstrates consuming the craft-sdk build-snap to satisfy a Python
-  project dependency on pydantic during snap build.
+  project dependency on pydantic, lxml, and cryptography during snap build.
 
 base: core24
 confinement: strict
@@ -35,6 +35,9 @@ parts:
     plugin: nil
     source: .
     after: [craft-sdk]
+    stage-packages:
+      - libxml2
+      - libxslt1.1
     build-packages:
       - python3-venv
       - python3-pip
